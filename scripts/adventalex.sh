@@ -26,15 +26,9 @@ validate_lang() {
 }
 
 find_next_day() {
-  awk '
-    NR>2 {
-      if ($NF ~ /todo/) {
-        gsub(/\|/, "", $2)
-        print $2
-        exit
-      }
-    }
-  ' "$PROGRESS_FILE"
+  grep 'todo.svg' "$PROGRESS_FILE" \
+    | head -n1 \
+    | awk -F'|' '{ gsub(/ /, "", $2); print $2 }'
 }
 
 cmd="${1:-}"
