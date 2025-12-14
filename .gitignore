@@ -1,0 +1,64 @@
+# =====================
+# OS / Editor
+# =====================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# =====================
+# Logs / Temp
+# =====================
+*.log
+tmp/
+.cache/
+
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# =====================
+# Bash
+# =====================
+*.bak
+
+# =====================
+# Go
+# =====================
+bin/
+build/
+*.exe
+*.out
+
+# =====================
+# Rust
+# =====================
+target/
+Cargo.lock
+
+# =====================
+# Zig
+# =====================
+zig-cache/
+zig-out/
+
+# =====================
+# JavaScript / Node.js
+# =====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env.local
+.env.development
+.env.production
+
+# build output
+dist/
