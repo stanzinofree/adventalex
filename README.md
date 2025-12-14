@@ -37,47 +37,74 @@ Obiettivo: **non perdere la mano, rinforzare le basi, divertirsi**.
 
 ### Avviare una nuova sfida
 
+**Modalità automatica** (consigliata):
+```bash
+./scripts/adventalex.sh start <linguaggio>
+```
+
+Lo script trova automaticamente la prossima sfida libera e legge il titolo da `STUDY.md`.
+
+Esempio:
+```bash
+./scripts/adventalex.sh start bash
+# 🔍 Prossima sfida libera: Day 02
+# 📖 Titolo da STUDY.md: File Permissions Checker
+# 🚀 Started: Bash 02 – File Permissions Checker
+
+./scripts/adventalex.sh start python
+# 🔍 Prossima sfida libera: Day 01
+# 📖 Titolo da STUDY.md: Hello + Environment
+```
+
+**Modalità manuale** (opzionale):
 ```bash
 ./scripts/adventalex.sh start <linguaggio> <numero> "<Titolo Sfida>"
 ```
 
 Esempio:
 ```bash
-./scripts/adventalex.sh start zig 1 "Zig Hello CLI"
-./scripts/adventalex.sh start bash 2 "Check Permissions"
+./scripts/adventalex.sh start zig 5 "Custom Challenge"
 ```
 
 Questo comando:
+- Crea automaticamente la directory `<linguaggio>/day<numero>/`
+- Genera `README.md`, file implementazione e test script
 - Aggiorna `progress.md` segnando la sfida come ⏳ started
 - Registra il timestamp di inizio
+- Aggiorna la tabella progressi in questo README
 
-### Struttura manuale della sfida
+### Struttura della sfida (auto-generata)
 
-Dopo aver avviato la sfida, crea manualmente:
+Il comando `start` crea automaticamente:
 
 1. **Directory della sfida**: `<linguaggio>/day<numero>/`
-   - Esempio: `bash/day02/`, `zig/day01/`
+   - Esempio: `bash/day02/`, `python/day01/`
 
-2. **File README.md**: Specifica della sfida
-   - Obiettivo della sfida
-   - Requisiti obbligatori
-   - Vincoli tecnici
-   - La prima riga deve contenere il titolo (con o senza #)
+2. **File README.md**: Template con:
+   - Titolo (da STUDY.md)
+   - Sezioni: Obiettivo, Requisiti, Vincoli, Risorse, Note
+   - Checklist requisiti vuota da completare
 
-3. **File di implementazione**: Soluzione alla sfida
-   - `main.zig`, `solution.sh`, `main.py`, etc.
+3. **File di implementazione**: Template specifico per linguaggio
+   - **Bash**: `<nome>.sh` con shebang e `set -euo pipefail`
+   - **Python**: `<nome>.py` con shebang, docstring e `main()`
+   - **Go**: `main.go` con `package main`
+   - **Rust**: `main.rs` con `fn main()`
+   - **Zig**: `main.zig` con `pub fn main()`
+   - **JavaScript**: `<nome>.js` con shebang Node.js
 
-4. **File di test**: Script eseguibile `test_*.sh`
-   - Deve essere eseguibile (`chmod +x`)
-   - Deve produrre output con `TEST_RESULT=<0-100>`
-   - Può usare le utility in `scripts/testlib/`
+4. **File di test**: Script `test_*.sh` eseguibile
+   - Include test base (compilazione, esecuzione)
+   - Usa utility da `scripts/testlib/`
+   - Segnaposto per test specifici
+   - Produce `TEST_RESULT=<0-100>`
 
-Esempio struttura:
+Esempio struttura generata:
 ```
 bash/day02/
-├── README.md              # Specifica della sfida
-├── check_perms.sh         # Implementazione
-└── test_check_perms.sh    # Test (eseguibile)
+├── README.md                      # Template con titolo da STUDY.md
+├── file_permissions_checker.sh    # Script bash con template
+└── test_file_permissions_checker.sh  # Test script con 5 test base
 ```
 
 ### Completare una sfida
@@ -140,17 +167,64 @@ echo "TEST_RESULT=$PERCENT"
 
 ## Workflow completo
 
-1. Avvia la sfida: `./scripts/adventalex.sh start bash 3 "Network Checker"`
-2. Crea la struttura:
+**Workflow semplificato (consigliato)**:
+
+1. **Avvia la sfida**: 
    ```bash
-   mkdir -p bash/day03
-   touch bash/day03/README.md
-   touch bash/day03/network_check.sh
-   touch bash/day03/test_network_check.sh
-   chmod +x bash/day03/network_check.sh
-   chmod +x bash/day03/test_network_check.sh
+   ./scripts/adventalex.sh start bash
    ```
-3. Scrivi specifica, implementazione e test
-4. Testa manualmente: `./bash/day03/test_network_check.sh`
-5. Completa: `./scripts/adventalex.sh done bash 3`
-6. Commit e vai alla prossima sfida!
+   Output:
+   ```
+   🔍 Prossima sfida libera: Day 03
+   📖 Titolo da STUDY.md: Network Connectivity Test
+   ✨ Struttura creata in: bash/day03
+   🚀 Started: Bash 03 – Network Connectivity Test
+   ```
+
+2. **Implementa la soluzione**:
+   ```bash
+   cd bash/day03
+   cat README.md                    # Leggi la specifica
+   vim network_connectivity_test.sh # Implementa
+   ```
+
+3. **Testa manualmente**:
+   ```bash
+   ./test_network_connectivity_test.sh
+   # ℹ Bash Day - Network Connectivity Test
+   # ✔ Script eseguibile
+   # ✔ Output non vuoto
+   # TEST_RESULT=40
+   ```
+
+4. **Completa quando i test passano**:
+   ```bash
+   cd ../..
+   ./scripts/adventalex.sh done bash 3
+   ```
+   Output se 100%:
+   ```
+   🧪 Running tests: bash/day03/test_network_connectivity_test.sh
+   TEST_RESULT=100
+   ✅ DONE (100%)
+   ```
+
+5. **Commit e prossima sfida**:
+   ```bash
+   git add bash/day03
+   git commit -m "Bash day03: Network Connectivity Test"
+   ./scripts/adventalex.sh start bash  # Automaticamente day04
+   ```
+
+**Ciclo quotidiano ideale**:
+```bash
+# Mattina (3 min)
+./scripts/adventalex.sh start python
+
+# Durante il giorno (10 min max)
+cd python/dayXX && vim *.py
+
+# Sera (2 min)
+./scripts/adventalex.sh done python XX
+git add . && git commit -m "Python dayXX: <titolo>"
+```
