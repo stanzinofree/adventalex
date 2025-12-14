@@ -1,4 +1,4 @@
-# Day 01 – bash
+# System Summary
 
 🗓️ Inizializzato il: **2025-12-14**
 

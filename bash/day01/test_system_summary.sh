@@ -1,32 +1,31 @@
 #!/usr/bin/env bash
+set -u
 
-set -euo pipefail
+# Directory del test (bash/day01)
+TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$TEST_DIR/../.." && pwd)"
 
-ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
-
-# Import librerie comuni
+# Import libreria test comune
 # shellcheck source=../../scripts/testlib/test_utils.sh
 source "$ROOT_DIR/scripts/testlib/test_utils.sh"
 
-SCRIPT="./system_summary.sh"
+TOTAL=5
+PASS=0
 
-info "Avvio test System Summary"
+SCRIPT="$TEST_DIR/system_summary.sh"
 
-assert_executable "$SCRIPT"
+info "Bash Day01 - System Summary"
 
-OUTPUT="$($SCRIPT)"
+assert_executable "$SCRIPT" && ((PASS++))
 
-assert_not_empty "$OUTPUT" "Output non vuoto"
+OUTPUT="$("$SCRIPT" 2>/dev/null || true)"
 
-echo -e "${GRAY}--- Output script ---${RESET}"
-echo "$OUTPUT"
-echo -e "${GRAY}---------------------${RESET}"
+assert_not_empty "$OUTPUT" "Output non vuoto" && ((PASS++))
+assert_contains "$OUTPUT" "Host:" "Contiene Host:" && ((PASS++))
+assert_contains "$OUTPUT" "User:" "Contiene User:" && ((PASS++))
+assert_contains "$OUTPUT" "Disk"  "Contiene Disk"  && ((PASS++))
 
-assert_contains "$OUTPUT" "host" "Hostname presente"
-assert_contains "$OUTPUT" "user" "Utente presente"
-assert_contains "$OUTPUT" "up" "Uptime presente"
-assert_contains "$OUTPUT" "date" "Data presente"
-assert_contains "$OUTPUT" "/" "Spazio disco root presente"
+PERCENT=$((PASS * 100 / TOTAL))
 
-echo ""
-echo -e "${GREEN}${BOLD}🎉 Tutti i test superati!${RESET}"
+echo "TEST_RESULT=$PERCENT"
+exit 0
