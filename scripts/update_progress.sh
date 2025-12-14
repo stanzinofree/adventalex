@@ -1,27 +1,90 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-DAY="$1"
-LANG="$2"
+ACTION="${1:-}"     # start|done|fail
+LANG="${2:-}"       # Bash|Zig
+NUM="${3:-}"        # 1..30
+TITLE="${4:-—}"     # nome sfida
+TESTPCT="${5:-—}"   # 0..100 oppure —
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROGRESS_FILE="$ROOT_DIR/progress.md"
+PROGRESS="$ROOT_DIR/progress.md"
+TMP="$PROGRESS.tmp"
 
-TODO_BADGE="![todo](assets/badges/todo.svg)"
-DONE_BADGE="![done](assets/badges/done.svg)"
-
-if [[ -z "$DAY" || -z "$LANG" ]]; then
-  echo "Uso: update_progress.sh <DAY> <LANG>"
+usage() {
+  echo "Uso:"
+  echo "  update_progress.sh start <Lang> <num> <title>"
+  echo "  update_progress.sh done  <Lang> <num> <title> <pct>"
+  echo "  update_progress.sh fail  <Lang> <num> <title> <pct>"
   exit 1
-fi
+}
 
-DAY_PADDED=$(printf "%02d" "$DAY")
+[[ -z "$ACTION" || -z "$LANG" || -z "$NUM" ]] && usage
 
-sed -i.bak \
-  "s#| $DAY_PADDED | $LANG | .* |#| $DAY_PADDED | $LANG | $DONE_BADGE |#" \
-  "$PROGRESS_FILE"
+NUM_PADDED=$(printf "%02d" "$NUM")
+TS="$(date '+%Y-%m-%d %H:%M')"
 
-rm -f "$PROGRESS_FILE.bak"
+case "$ACTION" in
+  start)
+    STATUS="⏳ started"
+    STARTED="$TS"
+    TEST="—"
+    ;;
+  done)
+    STATUS="✅ done"
+    STARTED="KEEP"
+    TEST="${TESTPCT}%"
+    ;;
+  fail)
+    STATUS="❌ failed"
+    STARTED="KEEP"
+    TEST="${TESTPCT}%"
+    ;;
+  *)
+    usage
+    ;;
+esac
 
-echo "✔ Giorno $DAY_PADDED ($LANG) marcato come DONE"
+awk -v lang="$LANG" \
+    -v num="$NUM_PADDED" \
+    -v status="$STATUS" \
+    -v title="$TITLE" \
+    -v started="$STARTED" \
+    -v test="$TEST" '
+BEGIN { in_section = 0 }
+
+# entra nella sezione del linguaggio
+$0 ~ "^## "lang"$" {
+  in_section = 1
+  print
+  next
+}
+
+# esce dalla sezione del linguaggio
+$0 ~ "^## " && in_section {
+  in_section = 0
+  print
+  next
+}
+
+# righe della tabella: parse per colonne
+in_section && $0 ~ /^\|/ {
+  split($0, c, "|")
+  for (i = 1; i <= length(c); i++) gsub(/^ +| +$/, "", c[i])
+
+  # c[2] = numero
+  if (c[2] == num) {
+    old_started = c[5]
+    new_started = started
+    if (started == "KEEP") new_started = old_started
+
+    print "| ", num, " | ", title, " | ", status, " | ", new_started, " | ", test, " |"
+    next
+  }
+}
+
+{ print }
+' "$PROGRESS" > "$TMP"
+
+mv "$TMP" "$PROGRESS"
+echo "✔ progress.md aggiornato: $ACTION $LANG $NUM_PADDED"

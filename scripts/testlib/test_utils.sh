@@ -1,45 +1,24 @@
 #!/usr/bin/env bash
+set -u
 
-set -euo pipefail
-
-# Carica colori
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=ansi.sh
 source "$SCRIPT_DIR/ansi.sh"
 
-fail() {
-  echo -e "${RED}${BOLD}❌ FAIL${RESET} $1"
-  exit 1
-}
+info() { echo -e "${BLUE}ℹ${RESET} $1"; }
+ok()   { echo -e "${GREEN}✔${RESET} $1"; }
+warn() { echo -e "${YELLOW}⚠${RESET} $1"; }
+bad()  { echo -e "${RED}✘${RESET} $1"; }
 
-pass() {
-  echo -e "${GREEN}✔${RESET} $1"
-}
-
-info() {
-  echo -e "${BLUE}ℹ${RESET} $1"
-}
-
-assert_not_empty() {
-  local value="$1"
-  local msg="$2"
-
-  [[ -z "$value" ]] && fail "$msg"
-  pass "$msg"
-}
-
-assert_contains() {
-  local haystack="$1"
-  local needle="$2"
-  local msg="$3"
-
-  echo "$haystack" | grep -qi "$needle" \
-    || fail "$msg"
-
-  pass "$msg"
-}
-
+# Assert "soft": ritorna 0/1 ma NON fa exit
 assert_executable() {
-  [[ -x "$1" ]] || fail "$1 non eseguibile o mancante"
-  pass "$1 eseguibile"
+  if [[ -x "$1" ]]; then ok "$1 eseguibile"; return 0; else bad "$1 non eseguibile"; return 1; fi
+}
+assert_not_empty() {
+  local v="$1" msg="$2"
+  if [[ -n "$v" ]]; then ok "$msg"; return 0; else bad "$msg"; return 1; fi
+}
+assert_contains() {
+  local hay="$1" needle="$2" msg="$3"
+  if echo "$hay" | grep -qi "$needle"; then ok "$msg"; return 0; else bad "$msg"; return 1; fi
 }

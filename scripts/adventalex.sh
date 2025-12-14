@@ -1,90 +1,64 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROGRESS_FILE="$ROOT_DIR/progress.md"
-
-SUPPORTED_LANGS="bash python go rust zig javascript"
 
 usage() {
   echo "Uso:"
-  echo "  adventalex.sh init <lang>"
-  echo "  adventalex.sh done <lang> <day>"
-  echo "  adventalex.sh status"
-  echo ""
-  echo "Linguaggi supportati: $SUPPORTED_LANGS"
+  echo "  adventalex.sh start <lang> <num> <title>"
+  echo "  adventalex.sh done  <lang> <num>"
   exit 1
 }
 
-validate_lang() {
-  for l in $SUPPORTED_LANGS; do
-    [[ "$l" == "$1" ]] && return 0
-  done
-  echo "❌ Linguaggio non supportato: $1"
-  usage
-}
-
-find_next_day() {
-  grep 'todo.svg' "$PROGRESS_FILE" \
-    | head -n1 \
-    | awk -F'|' '{ gsub(/ /, "", $2); print $2 }'
+lang_map() {
+  # converte "bash" -> "Bash", "zig" -> "Zig"
+  case "$1" in
+    bash) echo "Bash" ;;
+    zig) echo "Zig" ;;
+    *) echo "$1" ;;
+  esac
 }
 
 cmd="${1:-}"
-
 case "$cmd" in
-  init)
-    LANG="${2:-}"
-    [[ -z "$LANG" ]] && usage
-    validate_lang "$LANG"
-
-    DAY="$(find_next_day)"
-    [[ -z "$DAY" ]] && {
-      echo "🎉 Tutti i giorni completati!"
-      exit 0
-    }
-
-    DIR="$ROOT_DIR/$LANG/day$DAY"
-    mkdir -p "$DIR"
-
-    README="$DIR/README.md"
-    if [[ ! -f "$README" ]]; then
-      DATE_INIT="$(date '+%Y-%m-%d')"
-
-      cat > "$README" <<EOF
-# Day $DAY – $LANG
-
-🗓️ Inizializzato il: **$DATE_INIT**
-
-## Obiettivo
-
-## Vincoli
-- Max 10 minuti
-
-## Output atteso
-
-## Note
-EOF
-      echo "✔ Inizializzato Day $DAY ($LANG)"
-    else
-      echo "ℹ README già esistente"
-    fi
+  start)
+    LRAW="${2:-}"; NUM="${3:-}"; TITLE="${4:-}"
+    [[ -z "$LRAW" || -z "$NUM" || -z "$TITLE" ]] && usage
+    LANG="$(lang_map "$LRAW")"
+    ./scripts/update_progress.sh start "$LANG" "$NUM" "$TITLE"
+    echo "🚀 Started: $LANG $NUM – $TITLE"
     ;;
 
   done)
-    LANG="${2:-}"
-    DAY="${3:-}"
-    [[ -z "$LANG" || -z "$DAY" ]] && usage
-    validate_lang "$LANG"
+    LRAW="${2:-}"; NUM="${3:-}"
+    [[ -z "$LRAW" || -z "$NUM" ]] && usage
+    LANG="$(lang_map "$LRAW")"
+    NUM_PADDED=$(printf "%02d" "$NUM")
 
-    ./scripts/update_progress.sh "$DAY" "$LANG"
+    DAYDIR="$ROOT_DIR/$LRAW/day$NUM_PADDED"
+    TEST_SCRIPT="$(ls "$DAYDIR"/test_*.sh 2>/dev/null | head -n1 || true)"
+    [[ -n "$TEST_SCRIPT" && -x "$TEST_SCRIPT" ]] || { echo "❌ test_*.sh non trovato o non eseguibile in $DAYDIR"; exit 1; }
+
+    echo "🧪 Running tests: $TEST_SCRIPT"
+    OUT="$("$TEST_SCRIPT")"
+    echo "$OUT"
+
+    PCT="$(echo "$OUT" | awk -F= '/^TEST_RESULT=/ {print $2}' | tail -n1)"
+    [[ -n "$PCT" ]] || { echo "❌ TEST_RESULT non trovato nell’output del test"; exit 1; }
+
+    # Titolo: prova a leggerlo dal README (prima riga)
+    TITLE="$(sed -n '1{s/^# *//p;}' "$DAYDIR/README.md" 2>/dev/null | head -n1)"
+    [[ -n "$TITLE" ]] || TITLE="—"
+
+    if [[ "$PCT" -eq 100 ]]; then
+      ./scripts/update_progress.sh done "$LANG" "$NUM" "$TITLE" "$PCT"
+      echo "✅ DONE ($PCT%)"
+    else
+      ./scripts/update_progress.sh fail "$LANG" "$NUM" "$TITLE" "$PCT"
+      echo "❌ NOT DONE ($PCT%)"
+      exit 2
+    fi
     ;;
-
-  status)
-    cat "$PROGRESS_FILE"
-    ;;
-
   *)
     usage
     ;;
