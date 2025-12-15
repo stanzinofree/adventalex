@@ -35,47 +35,16 @@ Obiettivo: **non perdere la mano, rinforzare le basi, divertirsi**.
 
 ## Utilizzo
 
-### Avviare una nuova sfida
+### Tutte le 180 sfide sono già pronte!
 
-**Modalità automatica** (consigliata):
-```bash
-./scripts/adventalex.sh start <linguaggio>
-```
+**Non serve più il comando `start`** - tutte le sfide sono state pre-generate con:
+- README.md con obiettivo e descrizione
+- File di implementazione con template
+- Script di test funzionante
 
-Lo script trova automaticamente la prossima sfida libera e legge il titolo da `STUDY.md`.
+**Trova la tua prossima sfida**: Consulta `progress.md` per vedere quali sfide sono ⬜ todo.
 
-Esempio:
-```bash
-./scripts/adventalex.sh start bash
-# 🔍 Prossima sfida libera: Day 02
-# 📖 Titolo da STUDY.md: File Permissions Checker
-# 🚀 Started: Bash 02 – File Permissions Checker
-
-./scripts/adventalex.sh start python
-# 🔍 Prossima sfida libera: Day 01
-# 📖 Titolo da STUDY.md: Hello + Environment
-```
-
-**Modalità manuale** (opzionale):
-```bash
-./scripts/adventalex.sh start <linguaggio> <numero> "<Titolo Sfida>"
-```
-
-Esempio:
-```bash
-./scripts/adventalex.sh start zig 5 "Custom Challenge"
-```
-
-Questo comando:
-- Crea automaticamente la directory `<linguaggio>/day<numero>/`
-- Genera `README.md`, file implementazione e test script
-- Aggiorna `progress.md` segnando la sfida come ⏳ started
-- Registra il timestamp di inizio
-- Aggiorna la tabella progressi in questo README
-
-### Struttura della sfida (auto-generata)
-
-Il comando `start` crea automaticamente:
+### Struttura delle sfide (pre-generate)
 
 1. **Directory della sfida**: `<linguaggio>/day<numero>/`
    - Esempio: `bash/day02/`, `python/day01/`
@@ -167,64 +136,66 @@ echo "TEST_RESULT=$PERCENT"
 
 ## Workflow completo
 
-**Workflow semplificato (consigliato)**:
+**Workflow ultra-semplificato** (tutte le sfide già pronte!):
 
-1. **Avvia la sfida**: 
+1. **Scegli una sfida da `progress.md`**:
    ```bash
-   ./scripts/adventalex.sh start bash
-   ```
-   Output:
-   ```
-   🔍 Prossima sfida libera: Day 03
-   📖 Titolo da STUDY.md: Network Connectivity Test
-   ✨ Struttura creata in: bash/day03
-   🚀 Started: Bash 03 – Network Connectivity Test
+   # Trova la prossima sfida ⬜ todo per il linguaggio che preferisci
+   cat progress.md | grep -A 5 "## Bash"
    ```
 
-2. **Implementa la soluzione**:
+2. **Vai alla directory e leggi la sfida**:
    ```bash
-   cd bash/day03
-   cat README.md                    # Leggi la specifica
-   vim network_connectivity_test.sh # Implementa
+   cd bash/day04
+   cat README.md  # Leggi obiettivo, requisiti e risorse
    ```
 
-3. **Testa manualmente**:
+3. **Implementa la soluzione** (max 10 minuti):
    ```bash
-   ./test_network_connectivity_test.sh
-   # ℹ Bash Day - Network Connectivity Test
+   vim log_parser.sh  # Il file è già creato con template
+   ```
+
+4. **Testa manualmente**:
+   ```bash
+   ./test_log_parser.sh
+   # ℹ Bash Day - Log Parser
    # ✔ Script eseguibile
    # ✔ Output non vuoto
    # TEST_RESULT=40
    ```
 
-4. **Completa quando i test passano**:
+5. **Quando i test passano al 100%**:
    ```bash
    cd ../..
-   ./scripts/adventalex.sh done bash 3
+   ./scripts/adventalex.sh done bash 4
    ```
-   Output se 100%:
+   Output:
    ```
-   🧪 Running tests: bash/day03/test_network_connectivity_test.sh
+   🧪 Running tests: bash/day04/test_log_parser.sh
    TEST_RESULT=100
    ✅ DONE (100%)
    ```
 
-5. **Commit e prossima sfida**:
+6. **Commit e vai alla prossima**:
    ```bash
-   git add bash/day03
-   git commit -m "Bash day03: Network Connectivity Test"
-   ./scripts/adventalex.sh start bash  # Automaticamente day04
+   git add bash/day04
+   git commit -m "Bash day04: Log Parser"
+   # Scegli la prossima sfida da progress.md!
    ```
 
 **Ciclo quotidiano ideale**:
 ```bash
-# Mattina (3 min)
-./scripts/adventalex.sh start python
+# 1. Scegli sfida (30 sec)
+cat progress.md | grep -A 3 "## Python"
 
-# Durante il giorno (10 min max)
-cd python/dayXX && vim *.py
+# 2. Implementa (10 min max)
+cd python/day05 && vim http_client.py
 
-# Sera (2 min)
-./scripts/adventalex.sh done python XX
-git add . && git commit -m "Python dayXX: <titolo>"
+# 3. Completa (2 min)
+cd ../.. && ./scripts/adventalex.sh done python 5
+
+# 4. Commit (30 sec)
+git add . && git commit -m "Python day05: HTTP Client"
 ```
+
+**Total time: ~13 minuti/giorno** per mantenersi in allenamento! 🚀

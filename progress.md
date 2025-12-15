@@ -14,7 +14,7 @@ Legenda:
 |--|------|------|----------|------|
 |  01  |  System Summary  |  ✅ done  |  2025-12-14 20:48  |  100%  |
 |  02  |  File Permissions Checker  |  ❌ failed  |  2025-12-14 22:17  |  40%  |
-| 03 | — | ⬜ todo | — | — |
+|  03  |  Network Connectivity Test  |  ⏳ started  |  2025-12-14 22:24  |  —  |
 | 04 | — | ⬜ todo | — | — |
 | 05 | — | ⬜ todo | — | — |
 | 06 | — | ⬜ todo | — | — |
@@ -160,7 +160,7 @@ Legenda:
 
 | # | Sfida | Stato | StartedAt | Test |
 |--|------|------|----------|------|
-| 01 | — | ⬜ todo | — | — |
+|  01  |  Hello + Cargo  |  ⏳ started  |  2025-12-14 22:24  |  —  |
 | 02 | — | ⬜ todo | — | — |
 | 03 | — | ⬜ todo | — | — |
 | 04 | — | ⬜ todo | — | — |

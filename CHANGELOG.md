@@ -10,8 +10,44 @@ e questo progetto aderisce al [Semantic Versioning](https://semver.org/lang/it/)
 ### Da Aggiungere
 - Comando `list` per visualizzare stato globale
 - Comando `stats` per statistiche dettagliate
-- Generazione automatica completa struttura sfide nel comando `start`
-- Piano studi completo STUDY.md per tutti i linguaggi
+
+## [1.0.0] - 2025-12-14
+
+### 🎉 Release Completa - Tutte le 180 Sfide Pre-Generate!
+
+### Aggiunto
+- **180 sfide complete pre-generate** (30 × 6 linguaggi)
+  - Ogni sfida ha README.md con obiettivo e descrizione da STUDY.md
+  - File di implementazione con template specifico per linguaggio
+  - Script di test funzionante con test base
+- **Script `generate_all_challenges.sh`**:
+  - Genera tutte le sfide in batch
+  - Salta sfide già esistenti
+  - Report finale con statistiche
+- **File `challenge_functions.sh`**:
+  - Funzioni condivise estratte da adventalex.sh
+  - Riusabili da altri script
+- **README con risorse specifiche per linguaggio**:
+  - Bash: Bash Manual, ShellCheck, Bash Hackers Wiki
+  - Python: Python Docs, Tutorial, Real Python
+  - Go: Go Tour, Effective Go, Go by Example
+  - Rust: The Rust Book, Rust by Example, docs.rs
+  - Zig: Language Reference, Zig Learn, Standard Library
+  - JavaScript: MDN, Node.js Docs, JavaScript.info
+
+### Modificato
+- **adventalex.sh semplificato**:
+  - Rimosso comando `start` (non più necessario)
+  - Solo comando `done` per completare sfide
+  - Codice più snello e focalizzato
+- **README.md workflow aggiornato**:
+  - Non serve più generare sfide
+  - Workflow ultra-semplificato: scegli → implementa → testa → done
+  - Tempo stimato: ~13 min/giorno
+- **Descrizioni README più dettagliate**:
+  - Obiettivo preso da STUDY.md
+  - Link a risorse specifiche
+  - Note con riferimento a STUDY.md
 
 ## [0.2.0] - 2025-12-14
 
